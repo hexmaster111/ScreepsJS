@@ -3,10 +3,6 @@ var fs = require('fs');
 const tokens = require('./TOKENS.json');
 
 var filesInDir = fs.readdirSync('./src');
-if (filesInDir == undefined || filesInDir.length == 0) {
-    console.log("No files found in src folder! Creating main.js");
-    fs.mkdirSync('./src');
-}
 
 var files = {};
 var gotMain = false;
@@ -20,6 +16,7 @@ for (var i in filesInDir) {
     if (name == 'main') { gotMain = true; }
     var fileContent = fs.readFileSync('./src/' + file, 'utf8');
     files[name] = fileContent;
+    console.log("Added " + file + " to upload list.")
 }
 
 if (!gotMain) {
