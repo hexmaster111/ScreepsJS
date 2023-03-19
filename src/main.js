@@ -77,61 +77,28 @@ function GetHarvesterBodyPartsCounts(level) {
     switch (level) {
         case 0:
             return { works: 1, carries: 1, moves: 1 };
-        case 1: // 
-            return { works: 3, carries: 2, moves: 2 };
-        case 2: //
-            return { works: 5, carries: 3, moves: 3 };
-        case 3: //
-            return { works: 7, carries: 4, moves: 4 };
-        case 4: //
-            return { works: 9, carries: 5, moves: 5 };
-        case 5: //
-            return { works: 11, carries: 6, moves: 6 };
-        default:
-            console.log("ERROR: GetHarvesterBodyPartsCounts: level not found" + level);
+        case 1: //
             return { works: 1, carries: 1, moves: 1 };
+        case 2: //
+            return { works: 2, carries: 1, moves: 1 };
+        case 3: //
+            return { works: 1, carries: 1, moves: 2 };
+        case 4: //
+            return { works: 2, carries: 1, moves: 2 };
+        case 5: //
+            return { works: 2, carries: 1, moves: 2 };
+        default:
+            console.log("ERROR IN GET HARVTERBODYPARTSCOUNT level not found" + level);
+            return GetHarvesterBodyPartsCounts(level - 1);
     }
 }
 
 function GetBuilderBodyPartsCounts(level) {
-    switch (level) {
-        case 0:
-            return { works: 1, carries: 1, moves: 1 };
-        case 1: // 
-            return { works: 3, carries: 2, moves: 2 };
-        case 2: //
-            return { works: 5, carries: 3, moves: 3 };
-        case 3: //
-            return { works: 7, carries: 4, moves: 4 };
-        case 4: //
-            return { works: 9, carries: 5, moves: 5 };
-        case 5: //
-            return { works: 11, carries: 6, moves: 6 };
-        default:
-            console.log("ERROR: GetBuilderBodyPartsCounts: level not found" + level);
-            return { works: 1, carries: 1, moves: 1 };
-    }
+    return GetHarvesterBodyPartsCounts(level);
 }
 
 function GetUpgraderBodyPartsCounts(level) {
-    switch (level) {
-        case 0:
-            return { works: 1, carries: 1, moves: 1 };
-        case 1: // 
-            return { works: 3, carries: 2, moves: 2 };
-        case 2: //
-            return { works: 5, carries: 3, moves: 3 };
-        case 3: //
-            return { works: 7, carries: 4, moves: 4 };
-        case 4: //
-            return { works: 9, carries: 5, moves: 5 };
-        case 5: //
-            return { works: 11, carries: 6, moves: 6 };
-
-        default:
-            console.log("ERROR: GetUpgraderBodyPartsCounts: level not found" + level);
-            return { works: 1, carries: 1, moves: 1 };
-    }
+    return GetHarvesterBodyPartsCounts(level);
 }
 
 // CREEP COUNTS                                       CREEP COUNTS
@@ -149,7 +116,7 @@ module.exports.loop = function () {
 
 
     const requiredAmountOfBuilders = 3;
-    const requiredAmountOfUpgraders = 1;
+    const requiredAmountOfUpgraders = 3;
     const requiredAmountOfHarvesters = spawn.room.find(FIND_SOURCES).length;
 
     var currentHarvesters = spawn.room.find(FIND_MY_CREEPS,
@@ -173,13 +140,17 @@ module.exports.loop = function () {
 
 
     if (!spawn.spawning && !DEBUG) {
-        if (currentUpgraders.length < requiredAmountOfUpgraders && !useLowResorceMode) {
-            useLowResorceMode = true;
-            resorceResion = "Spawn Upgrader";
+
+        //if there is not a single upgrader, build one, else work with normal logic
+        if (currentUpgraders.length == 0) {
             var parts = GetUpgraderBodyPartsCounts(GetMyLevel());
             if (parts == undefined) { console.log("ERROR PARTS"); return; }
             var res = spawner.SpawnNewCreep(spawn, parts.works, parts.carries, parts.moves, 'U');
-            resorceGoal = spawner.GetCreepCost(parts.works, parts.carries, parts.moves);
+            if (res == OK) {
+                console.log("Spawned upgrader because there was none");
+            } else {
+                useLowResorceMode = true;
+            }
         }
 
         if ((currentHarvesters.length < requiredAmountOfHarvesters) && !useLowResorceMode) {
@@ -187,17 +158,32 @@ module.exports.loop = function () {
             var parts = GetHarvesterBodyPartsCounts(GetMyLevel());
             if (parts == undefined) { console.log("ERROR PARTS"); return; }
             resorceResion = "Spawn Harvester";
-            var res = spawner.SpawnNewCreep(spawn, parts.works, parts.carries, parts.moves, 'H');
+            res = spawner.SpawnNewCreep(spawn, parts.works, parts.carries, parts.moves, 'H');
             resorceGoal = spawner.GetCreepCost(parts.works, parts.carries, parts.moves);
 
         }
+
+        if (currentUpgraders.length < requiredAmountOfUpgraders && !useLowResorceMode) {
+            var res = undefined;
+            useLowResorceMode = true;
+            resorceResion = "Spawn Upgrader";
+            var parts = GetUpgraderBodyPartsCounts(GetMyLevel());
+            if (parts == undefined) { console.log("ERROR PARTS"); return; }
+            res = spawner.SpawnNewCreep(spawn, parts.works, parts.carries, parts.moves, 'U');
+            resorceGoal = spawner.GetCreepCost(parts.works, parts.carries, parts.moves);
+        }
+
         if (currentBuilders.length < requiredAmountOfBuilders && !useLowResorceMode) {
             useLowResorceMode = true;
             resorceResion = "Spawn Builder";
             var parts = GetBuilderBodyPartsCounts(GetMyLevel());
             if (parts == undefined) { console.log("ERROR PARTS"); return; }
-            var res = spawner.SpawnNewCreep(spawn, parts.works, parts.carries, parts.moves, 'B');
+            res = spawner.SpawnNewCreep(spawn, parts.works, parts.carries, parts.moves, 'B');
             resorceGoal = spawner.GetCreepCost(parts.works, parts.carries, parts.moves);
+        }
+
+        if (res != undefined) {
+            console.log("Error spawing " + GetStringFromErrorCode(res));
         }
 
     }
@@ -220,13 +206,21 @@ module.exports.loop = function () {
                     break;
                 }
                 builderLogic.run(creep, spawn, useLowResorceMode);
+
+                if (buildJobCount == 0) {
+                    upgraderLogic.run(creep, spawn, useLowResorceMode);
+                }
+
                 break;
             case 'U':
-                // if (useLowResorceMode) {
+                // if (currentHarvesters.length < requiredAmountOfHarvesters - 1) {
+                //     creep.say("Harvest");
                 //     harversterLogic.run(creep, spawn);
                 //     break;
                 // }
                 upgraderLogic.run(creep, spawn, useLowResorceMode);
+                break;
+
                 break;
             case undefined:
                 console.log("Undefined creep role: " + creep.name);

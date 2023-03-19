@@ -117,20 +117,20 @@ var harvesterLogic = {
 
         if (!isFilling) {
             if (creep.transfer(dest, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(dest, { visualizePathStyle: { stroke: '#ffffff' } });
+                creep.moveTo(dest, { visualizePathStyle: { stroke: 'green' } });
             }
         }
 
         if (isFull) {
             if (creep.transfer(dest, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(dest, { visualizePathStyle: { stroke: '#ffffff' } });
+                creep.moveTo(dest, { visualizePathStyle: { stroke: 'green' } });
             }
         }
 
 
         if (isFilling) {
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                var move = creep.moveTo(source, { visualizePathStyle: { stroke: '#ffaa00' } });
+                var move = creep.moveTo(source, { visualizePathStyle: { stroke: 'green' } });
                 if (move == ERR_NO_PATH) {
                     creep.say("No Path");
                 }

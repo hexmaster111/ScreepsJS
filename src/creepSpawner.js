@@ -51,16 +51,6 @@ var creepSpawner = {
             body.push(MOVE);
         }
 
-        // console.log(JSON.stringify(body));
-
-        var bodyCost = (workCount + carryCount + moveCount) * 100;
-
-        var powerAvailable = spawn.room.energyAvailable;
-
-
-        // console.log("Cost " + bodyCost + " Parts: " + body.length +
-        //     " Body: " + JSON.stringify(body) + " Power Available: " + powerAvailable +
-        //     " Name " + newName);
 
         var res = SpawnNewCreep(spawn, body, newName, { memory: { group: group } });
         return res;

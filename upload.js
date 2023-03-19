@@ -29,7 +29,8 @@ if (!gotMain) {
 var email = tokens.email;
 var password = tokens.password;
 
-var branch = 'default';
+// var branch = 'default';
+var branch = 'sim';
 //if any arguments have -b or --branch, use the next argument as the branch name
 for (var i = 0; i < process.argv.length; i++) {
     if (process.argv[i] == '-b' || process.argv[i] == '--branch') {

@@ -61,7 +61,7 @@ var buidlerLogic = {
             var source = finder.findEnergySource(creep);
             if (source != undefined) {
                 if (creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(source, { visualizePathStyle: { stroke: '#FF0000FF' } });
+                    creep.moveTo(source, { visualizePathStyle: { stroke: 'red' } });
                 }
             }
             else {
@@ -78,7 +78,7 @@ var buidlerLogic = {
                 var buildFastSite = buildFastFlag.pos.lookFor(LOOK_CONSTRUCTION_SITES);
                 if (buildFastSite != undefined && buildFastSite.length > 0) {
                     if (creep.build(buildFastSite[0]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(buildFastSite[0], { visualizePathStyle: { stroke: '#FF0000FF' } });
+                        creep.moveTo(buildFastSite[0], { visualizePathStyle: { stroke: 'yellow' } });
                     }
                     return;
                 }
@@ -87,7 +87,7 @@ var buidlerLogic = {
             var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
             if (constructionSite != undefined) {
                 if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(constructionSite, { visualizePathStyle: { stroke: '#ffffff' } });
+                    creep.moveTo(constructionSite, { visualizePathStyle: { stroke: 'red' } });
                 }
             } else {
                 harvesterLogic.run(creep, spawn);

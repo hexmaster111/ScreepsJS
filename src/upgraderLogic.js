@@ -25,7 +25,7 @@ var upgraderLogic = {
 
         if (creep.memory.upgrading) {
             if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: '#ffffff' } });
+                creep.moveTo(creep.room.controller, { visualizePathStyle: { stroke: 'red' } });
             }
         }
 
@@ -33,13 +33,11 @@ var upgraderLogic = {
 
             var spawnOrExtension = finder.findEnergySource(creep);
             if (spawnOrExtension == undefined) {
-                creep.say("🧺 Harvest");
-                Harvester.run(creep, spawn);
-                return;
+
             }
 
             if (creep.withdraw(spawnOrExtension, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawnOrExtension, { visualizePathStyle: { stroke: '#ffaa00' } });
+                creep.moveTo(spawnOrExtension, { visualizePathStyle: { stroke: 'red' } });
             }
         }
 
