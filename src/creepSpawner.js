@@ -12,8 +12,12 @@
 
 var creepSpawner = {
     SpawnNewCreep: function (spawn, workCount, carryCount, moveCount, group) {
-        var newName = "W" + workCount + "C" + carryCount + "M" + moveCount + "[" + group + "]";
+        var creepCount = _.filter(Game.creeps, (creep) => creep.memory.group == group).length;
+        var newName = "W" + workCount + "C" + carryCount + "M" + moveCount +
+            "[" + group + "]" + creepCount;
         console.log('Spawning new creep: ' + newName);
+        console.log("Creep Count: " + creepCount);
+
         var body = [];
         for (var i = 0; i < workCount; i++) {
             body.push(WORK);

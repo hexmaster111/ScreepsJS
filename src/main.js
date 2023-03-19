@@ -4,6 +4,8 @@ var builderLogic = require('builderLogic');
 var upgraderLogic = require('upgraderLogic');
 var spawner = require('creepSpawner');
 
+//BIG CHANGE
+
 module.exports.loop = function () {
     if (!Game.spawns['Spawn1']) { return; }
     let spawn = Game.spawns['Spawn1'];
@@ -51,23 +53,20 @@ module.exports.loop = function () {
             var newName = 'W1C1M1:[U]' + Game.time;
             useLowResorceMode = true;
             console.log('Spawning new upgrader: ' + newName);
-            spawn.spawnCreep([WORK, CARRY, MOVE], newName,
-                { memory: { group: 'U' } });
+            var res = spawner.SpawnNewCreep(spawn, 1, 2, 1, 'U');
         }
 
         if ((currentHarvesters.length < requiredAmountOfHarvesters) && !useLowResorceMode) {
             useLowResorceMode = true;
             var newName = 'W1C1M1[H]' + Game.time;
             console.log('Spawning new harvester: ' + newName);
-            spawn.spawnCreep([WORK, CARRY, MOVE], newName,
-                { memory: { group: 'H' } });
+            var res = spawner.SpawnNewCreep(spawn, 1, 2, 1, 'H');
         }
         if (currentBuilders.length < requiredAmountOfBuilders && !useLowResorceMode) {
             var newName = 'W1C1M1[B]' + Game.time;
             useLowResorceMode = true;
             console.log('Spawning new builder: ' + newName);
-            spawn.spawnCreep([WORK, CARRY, MOVE], newName,
-                { memory: { group: 'B' } });
+            var res = spawner.SpawnNewCreep(spawn, 1, 2, 1, 'B');
         }
 
     }
@@ -87,11 +86,9 @@ module.exports.loop = function () {
                 harversterLogic.run(creep, spawn);
                 break;
             case 'B':
-                harversterLogic.run(creep, spawn);
-                // builderLogic.run(creep, spawn, useLowResorceMode);
+                builderLogic.run(creep, spawn, useLowResorceMode);
                 break;
             case 'U':
-                // harversterLogic.run(creep, spawn);
                 upgraderLogic.run(creep, spawn, useLowResorceMode);
                 break;
             case undefined:

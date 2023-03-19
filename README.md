@@ -11,3 +11,6 @@
   - Copy the `TOKENS_EXAMPLE` to TOKENS.json 
   - fill it out
   - run upload.js and everything in your src direcotry will be copied over to the branch default
+
+## Commands
+  - `node .\upload.js` - uploads all files in src to the branch default

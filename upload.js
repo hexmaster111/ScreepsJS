@@ -4,8 +4,6 @@ const tokens = require('./TOKENS.json');
 
 var filesInDir = fs.readdirSync('./src');
 
-console.log("Started at " + new Date().toLocaleString() + "");
-
 var files = {};
 var gotMain = false;
 for (var i in filesInDir) {
@@ -31,8 +29,19 @@ if (!gotMain) {
 var email = tokens.email;
 var password = tokens.password;
 
+var branch = 'default';
+//if any arguments have -b or --branch, use the next argument as the branch name
+for (var i = 0; i < process.argv.length; i++) {
+    if (process.argv[i] == '-b' || process.argv[i] == '--branch') {
+        branch = process.argv[i + 1];
+        break;
+    }
+}
+
+console.log("Uploading to branch \"" + branch + "\" at " + new Date().toLocaleString());
+
 var data = {
-    branch: 'default',
+    branch: branch,
     modules: files
 };
 
@@ -54,4 +63,4 @@ if (req.error) {
     return;
 }
 
-console.log("Uploaded at " + new Date().toLocaleString() + "");
+console.log("Uploaded");
