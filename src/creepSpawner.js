@@ -10,13 +10,35 @@
 // var moveParts = creep.body.filter(p => p.type == MOVE).length;
 // var newName = "W" + workParts + "C" + carryParts + "M" + moveParts + "[B]";
 
+function SpawnNewCreep(spawn, body, name, args) {
+    return spawn.spawnCreep(body, name, args);
+}
+
+
+
+
+function GetName(workCount, carryCount, moveCount, group) {
+    var gametime = Game.time;
+
+    //Make the game time only 4 digits
+    var gametimeString = gametime.toString();
+    var gametimeLength = gametimeString.length;
+    if (gametimeLength > 4) {
+        gametimeString = gametimeString.substring(gametimeLength - 4, gametimeLength);
+    }
+
+    var newName = "W" + workCount + "C" + carryCount + "M" + moveCount + "[" + group + "]" + gametimeString;
+    return newName;
+}
+
 var creepSpawner = {
+    GetCreepCost: function (workCount, carryCount, moveCount) {
+        var bodyCost = (workCount + carryCount + moveCount) * 100;
+        return bodyCost;
+    },
+
     SpawnNewCreep: function (spawn, workCount, carryCount, moveCount, group) {
-        var creepCount = _.filter(Game.creeps, (creep) => creep.memory.group == group).length;
-        var newName = "W" + workCount + "C" + carryCount + "M" + moveCount +
-            "[" + group + "]" + creepCount;
-        console.log('Spawning new creep: ' + newName);
-        console.log("Creep Count: " + creepCount);
+        var newName = GetName(workCount, carryCount, moveCount, group);
 
         var body = [];
         for (var i = 0; i < workCount; i++) {
@@ -31,20 +53,17 @@ var creepSpawner = {
 
         // console.log(JSON.stringify(body));
 
-        const partCost = 100;
-        var cost = 300; //300 is base cost
-        var bodyCost = (workCount + carryCount + moveCount) * partCost;
-        cost += bodyCost;
+        var bodyCost = (workCount + carryCount + moveCount) * 100;
 
         var powerAvailable = spawn.room.energyAvailable;
 
 
-        console.log("Cost of body: " + bodyCost + " Power Available: " + powerAvailable + " Cost: " + cost);
+        // console.log("Cost " + bodyCost + " Parts: " + body.length +
+        //     " Body: " + JSON.stringify(body) + " Power Available: " + powerAvailable +
+        //     " Name " + newName);
 
-        return spawn.spawnCreep(body, newName,
-            { memory: { role: 'builder', group: group } }
-        );
-
+        var res = SpawnNewCreep(spawn, body, newName, { memory: { group: group } });
+        return res;
     }
 };
 

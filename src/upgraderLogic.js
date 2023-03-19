@@ -1,5 +1,9 @@
+var Harvester = require('harvesterLogic');
+var finder = require('finder');
+
+
 var upgraderLogic = {
-    run: function (creep, spawn, useLowResorceMode) {
+    run: function (creep, spawn) {
         // Get Energy from spawn
         // If the creep is full, it will go to the controller and upgrade it
         // If the creep is empty, it will go to the spawn and get energy
@@ -7,10 +11,7 @@ var upgraderLogic = {
             creep.memory.upgrading = false;
         }
 
-        if (useLowResorceMode) {
-            return;
-        }
-
+        // console.log("Upgrader: " + creep.memory.upgrading + " " + creep.store[RESOURCE_ENERGY] + "/" + creep.store.getFreeCapacity());
         if (creep.memory.upgrading && creep.store[RESOURCE_ENERGY] == 0) {
             creep.memory.upgrading = false;
             creep.say('🔄 harvest');
@@ -30,13 +31,12 @@ var upgraderLogic = {
 
         if (!creep.memory.upgrading) {
 
-            var spawnOrExtension = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_SPAWN ||
-                        structure.structureType == STRUCTURE_EXTENSION) &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-                }
-            });
+            var spawnOrExtension = finder.findEnergySource(creep);
+            if (spawnOrExtension == undefined) {
+                creep.say("🧺 Harvest");
+                Harvester.run(creep, spawn);
+                return;
+            }
 
             if (creep.withdraw(spawnOrExtension, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(spawnOrExtension, { visualizePathStyle: { stroke: '#ffaa00' } });

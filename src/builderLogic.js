@@ -1,19 +1,50 @@
 var harvesterLogic = require('harvesterLogic');
+var finder = require('finder');
+function GetStringFromErrorCode(errorCode) {
+    switch (errorCode) {
+        case OK:
+            return "OK";
+        case ERR_NOT_OWNER:
+            return "ERR_NOT_OWNER";
+        case ERR_BUSY:
+            return "ERR_BUSY";
+        case ERR_NOT_FOUND:
+            return "ERR_NOT_FOUND";
+        case ERR_NOT_ENOUGH_RESOURCES:
+            return "ERR_NOT_ENOUGH_RESOURCES";
+        case ERR_NOT_ENOUGH_ENERGY:
+            return "ERR_NOT_ENOUGH_ENERGY";
+        case ERR_INVALID_TARGET:
+            return "ERR_INVALID_TARGET";
+        case ERR_FULL:
+            return "ERR_FULL";
+        case ERR_NOT_IN_RANGE:
+            return "ERR_NOT_IN_RANGE";
+        case ERR_NAME_EXISTS:
+            return "ERR_NAME_EXISTS";
+        case ERR_NO_BODYPART:
+            return "ERR_NO_BODYPART";
+        case ERR_NOT_ENOUGH_EXTENSIONS:
+            return "ERR_NOT_ENOUGH_EXTENSIONS";
+        case ERR_RCL_NOT_ENOUGH:
+            return "ERR_RCL_NOT_ENOUGH";
+        case ERR_GCL_NOT_ENOUGH:
+            return "ERR_GCL_NOT_ENOUGH";
+        default:
+            return "UNKNOWN ERROR CODE: " + errorCode;
+    }
+}
+
+
+
+
+
+
+
+
+
 var buidlerLogic = {
-    run: function (creep, spawn, useLowResorceMode) {
-
-
-        if (useLowResorceMode) {
-            harvesterLogic.run(creep, spawn);
-            return;
-        }
-
-
-
-        // Get Energy from spawn
-        // If the creep is empty, it will go to the spawn and get energy
-        // If the creep is full, it will go to the closest construction site and build it
-        // If there is no construction site, it will go to the controller and upgrade it
+    run: function (creep, spawn) {
         if (creep.memory.building == undefined) {
             creep.memory.building = true;
         }
@@ -27,34 +58,20 @@ var buidlerLogic = {
         }
 
         if (!creep.memory.building) {
-            var spawnOrExtension = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_SPAWN ||
-                        structure.structureType == STRUCTURE_EXTENSION) &&
-                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+            var source = finder.findEnergySource(creep);
+            if (source != undefined) {
+                if (creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source, { visualizePathStyle: { stroke: '#FF0000FF' } });
                 }
-            });
-            if (spawnOrExtension != undefined) {
-                if (creep.withdraw(spawnOrExtension, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(spawnOrExtension, { visualizePathStyle: { stroke: '#ffaa00' } });
-                    return;
-                }
-                return;
             }
-
-            if (creep.withdraw(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ffaa00' } });
-                return;
+            else {
+                // console.log("Builder " + creep.name + " is out of energy and can't find a spawn or extension");
+                // console.log("Builder " + creep.name + " is going to harvest");
+                harvesterLogic.run(creep, spawn);
             }
-
-
-            console.log("Creep: " + creep.name + " is building: " + creep.memory.building +
-                " and has energy: " + creep.store[RESOURCE_ENERGY] + " and has free capacity: " +
-                creep.store.getFreeCapacity());
         }
 
         if (creep.memory.building) {
-
             //if there is a flag labeled "BUILDFAST" then build that first
             var buildFastFlag = Game.flags["BUILDFAST"];
             if (buildFastFlag != undefined) {
