@@ -4,6 +4,8 @@ const tokens = require('./TOKENS.json');
 
 var filesInDir = fs.readdirSync('./src');
 
+console.log("Started at " + new Date().toLocaleString() + "");
+
 var files = {};
 var gotMain = false;
 for (var i in filesInDir) {
@@ -47,3 +49,9 @@ var req = https.request({
 
 req.write(JSON.stringify(data));
 req.end();
+if (req.error) {
+    console.log(req.error);
+    return;
+}
+
+console.log("Uploaded at " + new Date().toLocaleString() + "");

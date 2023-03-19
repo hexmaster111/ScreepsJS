@@ -29,8 +29,17 @@ var upgraderLogic = {
         }
 
         if (!creep.memory.upgrading) {
-            if (creep.withdraw(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ffaa00' } });
+
+            var spawnOrExtension = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return (structure.structureType == STRUCTURE_SPAWN ||
+                        structure.structureType == STRUCTURE_EXTENSION) &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                }
+            });
+
+            if (creep.withdraw(spawnOrExtension, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(spawnOrExtension, { visualizePathStyle: { stroke: '#ffaa00' } });
             }
         }
 

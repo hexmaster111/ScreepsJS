@@ -9,6 +9,18 @@ var harvesterLogic = {
         var isEmpty = creep.store.getUsedCapacity() == 0;
         var isFilling = creep.memory.isFilling;
         var source = creep.pos.findClosestByPath(FIND_SOURCES);
+        var dest = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (structure.structureType == STRUCTURE_SPAWN ||
+                    structure.structureType == STRUCTURE_EXTENSION) &&
+                    structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+            }
+        });
+
+        if (dest == undefined) {
+            dest = spawn;
+        }
+
         if (isFilling == undefined) {
             creep.memory.isFilling = true;
             isFilling = true;
@@ -26,14 +38,14 @@ var harvesterLogic = {
         }
 
         if (!isFilling) {
-            if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ffffff' } });
+            if (creep.transfer(dest, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(dest, { visualizePathStyle: { stroke: '#ffffff' } });
             }
         }
 
         if (isFull) {
-            if (creep.transfer(spawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(spawn, { visualizePathStyle: { stroke: '#ffffff' } });
+            if (creep.transfer(dest, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(dest, { visualizePathStyle: { stroke: '#ffffff' } });
             }
         }
 
