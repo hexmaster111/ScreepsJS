@@ -10,6 +10,18 @@
 // var moveParts = creep.body.filter(p => p.type == MOVE).length;
 // var newName = "W" + workParts + "C" + carryParts + "M" + moveParts + "[B]";
 
+var bodyCost = {
+    "move": 50,
+    "carry": 50,
+    "work": 100,
+    "heal": 250,
+    "tough": 10,
+    "attack": 80,
+    "ranged_attack": 150,
+    "claim": 600,
+};
+
+
 function SpawnNewCreep(spawn, body, name, args) {
     return spawn.spawnCreep(body, name, args);
 }
@@ -32,9 +44,16 @@ function GetName(workCount, carryCount, moveCount, group) {
 }
 
 var creepSpawner = {
-    GetCreepCost: function (workCount, carryCount, moveCount) {
-        var bodyCost = (workCount + carryCount + moveCount) * 100;
-        return bodyCost;
+    GetCreepCost: function (workCount, carryCount, moveCount, heal, tough, attack, ranged_attack) {
+        var cost = 0;
+        if (workCount) cost += workCount * bodyCost["work"];
+        if (carryCount) cost += carryCount * bodyCost["carry"];
+        if (moveCount) cost += moveCount * bodyCost["move"];
+        if (heal) cost += heal * bodyCost["heal"];
+        if (tough) cost += tough * bodyCost["tough"];
+        if (attack) cost += attack * bodyCost["attack"];
+        if (ranged_attack) cost += ranged_attack * bodyCost["ranged_attack"];
+        return cost;
     },
 
     SpawnNewCreep: function (spawn, workCount, carryCount, moveCount, group) {

@@ -73,7 +73,7 @@ function findOpenSource(creep) {
 
 //harverster module
 var harvesterLogic = {
-    run: function (creep, spawn) {
+    run: function (creep, spawn, useLowResorceMode) {
         // Gets energy from the closest source
         // If the creep is full, it will go to the spawn and transfer the energy
         // If the creep is empty, it will go to the closest source and get energy
@@ -86,11 +86,16 @@ var harvesterLogic = {
         source = findOpenSource(creep);
 
 
-
         var dest = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (structure) => {
-                return (structure.structureType == STRUCTURE_SPAWN ||
-                    structure.structureType == STRUCTURE_EXTENSION) &&
+                if (useLowResorceMode)
+                    return (structure.structureType == STRUCTURE_EXTENSION ||
+                        structure.structureType == STRUCTURE_SPAWN) &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+
+                return (structure.structureType == STRUCTURE_EXTENSION ||
+                    structure.structureType == STRUCTURE_SPAWN ||
+                    structure.structureType == STRUCTURE_TOWER) &&
                     structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
             }
         });
@@ -128,7 +133,34 @@ var harvesterLogic = {
         }
 
 
+
+
         if (isFilling) {
+
+            //IF any flags have FILLFIRST on them, then go to the closest one and fill it up if it is not full
+            var fillFirstFlags = creep.room.find(FIND_FLAGS, {
+                filter: (flag) => {
+                    return flag.name == "FILLFIRST";
+                }
+            });
+
+            if (fillFirstFlags.length > 0) {
+                var fillFirstFlag = fillFirstFlags[0];
+                var fillFirstFlagPos = fillFirstFlag.pos;
+                var fillFirstFlagStructures = fillFirstFlagPos.lookFor(LOOK_STRUCTURES);
+                if (fillFirstFlagStructures.length > 0) {
+                    var fillFirstFlagStructure = fillFirstFlagStructures[0];
+                    if (fillFirstFlagStructure.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+                        if (creep.transfer(fillFirstFlagStructure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(fillFirstFlagStructure, { visualizePathStyle: { stroke: 'purple' } });
+                            creep.say("FILLING FIRST RAWR");
+                            console.log("FILLING ****************************************************************");
+                        }
+                    }
+                }
+            }
+
+
             if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
                 var move = creep.moveTo(source, { visualizePathStyle: { stroke: 'green' } });
                 if (move == ERR_NO_PATH) {
@@ -136,6 +168,7 @@ var harvesterLogic = {
                 }
             }
         }
+
 
 
 
